@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: roman-converter
+  namespace: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: roman-converter
+  template:
+    metadata:
+      labels:
+        app: roman-converter
+    spec:
+      containers:
+        - name: roman-converter
+          image: roman-converter:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: roman-converter-service
+  namespace: production
+spec:
+  selector:
+    app: roman-converter
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: LoadBalancer
