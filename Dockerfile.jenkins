@@ -1,0 +1,10 @@
+FROM jenkins/jenkins:lts
+USER root
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -L https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz -o jdk21.tar.gz && \
+    tar xzf jdk21.tar.gz -C /opt && \
+    rm jdk21.tar.gz
+ENV JAVA_HOME /opt/jdk-21.0.2
+ENV PATH $JAVA_HOME/bin:$PATH
+USER jenkins

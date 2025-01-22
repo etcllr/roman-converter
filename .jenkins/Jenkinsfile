@@ -1,7 +1,13 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'JDK21'
+    }
+
     environment {
+        JAVA_HOME = tool 'JDK21'
+        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
         DOCKER_IMAGE = 'roman-converter'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         KUBECONFIG = credentials('kubeconfig')
@@ -12,12 +18,13 @@ pipeline {
             steps {
                 sh 'chmod +x gradlew'
                 sh 'git config --global --add safe.directory /var/jenkins_home/workspace/roman-converter'
+                sh 'java -version'
             }
         }
 
         stage('Build') {
             steps {
-                sh './gradlew clean build --no-daemon'
+                sh './gradlew clean build --no-daemon --info'
             }
         }
 
