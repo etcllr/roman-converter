@@ -8,15 +8,22 @@ pipeline {
     }
 
     stages {
+        stage('Prepare') {
+            steps {
+                sh 'chmod +x gradlew'
+                sh 'git config --global --add safe.directory /var/jenkins_home/workspace/roman-converter'
+            }
+        }
+
         stage('Build') {
             steps {
-                sh './gradlew clean build'
+                sh './gradlew clean build --no-daemon'
             }
         }
 
         stage('Test') {
             steps {
-                sh './gradlew test'
+                sh './gradlew test --no-daemon'
             }
             post {
                 always {
@@ -50,6 +57,18 @@ pipeline {
                     roman-converter=${DOCKER_IMAGE}:${DOCKER_TAG} -n production
                 """
             }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
